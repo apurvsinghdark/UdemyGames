@@ -68,7 +68,6 @@ public class Rocket : MonoBehaviour
         switch(collision.gameObject.tag)
         {
             case "Friendly":
-                //
                 break;
             case "Finish":
                 StartSuccessSequence();
@@ -104,7 +103,10 @@ public class Rocket : MonoBehaviour
 
     private void LoadNextScene()
     {
-        SceneManager.LoadScene(1);
+        int currentScene = SceneManager.GetActiveScene().buildIndex;
+        var loadNextScene = currentScene + 1;
+        if(loadNextScene == SceneManager.sceneCountInBuildSettings ) { loadNextScene = 0; }   
+        SceneManager.LoadScene(loadNextScene);
     }
 
     void RespondOnThrustApply()
@@ -117,11 +119,16 @@ public class Rocket : MonoBehaviour
         }
         else
         {
-            if (rocketAudio.isPlaying)
-                rocketAudio.Stop();
-
-            mainEngineParticle.Stop();
+            StopApplyThrust();
         }
+    }
+
+    private void StopApplyThrust()
+    {
+        if (rocketAudio.isPlaying)
+            rocketAudio.Stop();
+
+        mainEngineParticle.Stop();
     }
 
     void ApplyThrust(float rotationThisFrame)
@@ -135,7 +142,7 @@ public class Rocket : MonoBehaviour
 
     private void RespondOnRotationApply()
     {
-        rigidbody.freezeRotation = true;
+        rigidbody.angularVelocity = Vector3.zero;
 
         float rotationThisFrame = rcsThrust * Time.deltaTime;
         
@@ -148,7 +155,5 @@ public class Rocket : MonoBehaviour
         {
             transform.Rotate(-Vector3.forward * rotationThisFrame);
         }
-        
-        rigidbody.freezeRotation = false;
     }
 }
